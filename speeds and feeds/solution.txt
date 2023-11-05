@@ -1,0 +1,8 @@
+There is a hint "What language does a CNC machine use?"
+CNC machines use G-code, which is what is listed when connecting to mercury.picoctf.net on port 59953.
+
+Go to the https://ncviewer.com/ to convert G-code and draw a plot.
+
+Drawing shows flag:
+
+picoCTF{num3r1cal_c0ntr0l_f3fea95b}
