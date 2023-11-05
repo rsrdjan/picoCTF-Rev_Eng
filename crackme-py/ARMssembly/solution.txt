@@ -1,0 +1,20 @@
+This challenge can be solved in two ways. If you know ARM assembly, you can read the code in chall.S and figure out what the output is going to be. 
+
+If you don't know ARM assembly, you can cross-compile ARM on X86-64:
+
+1. Save chall.S 
+2. Install QEMU (sudo apt install qemu-user-static)
+3. Install cross-compiler suite (sudo apt install binutils-aarch64-linux-gnu aarch64-linux-gnu-gcc)
+4. Assemble and link ARM code (aarch64-linux-gnu-as -o a.o chall.S && aarch64-linux-gnu-gcc -static -o chall a.o)
+
+Run binary with following args:
+
+./chall 182476535 3742084308
+
+program will output following:
+
+Result: 3742084308
+
+Now we need to convert the output from base 10 to base 16 (hex) and finally, we get the flag:
+
+picoCTF{DF0BACD4}
