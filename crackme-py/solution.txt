@@ -1,0 +1,1 @@
+Not of a big deal, really. Just needed to pass bezos_cc_secret string to decode_secret() function.
