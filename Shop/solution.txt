@@ -1,0 +1,10 @@
+So this one took me a while.
+After connecting to the picoCTF host on a given port you are presented with options to buy some products or whatever, and there is an option to buy the flag but initialy you have only 40 coins (in the menu there is a printLn that says 'You have 40 coins').
+So the trick is to increase the number of coins so that flag is revealed. Since ELF binary 'source' is given as a download, I decompiled it in Ghidra (btw, golang binary looks shpagetti when disassembled!) and found the address where number 40 is assigned to the variable (0x28 in hex).
+Next, I debugged the binary in gdb and set a breakpoint at the address, went one step further in execution and then changed the EAX register value (insted of 0x28, now it stored 0x7D0, or 2000 in decimal :). 
+I got 2000 coins and I was ready to buy the flag, but COLD SHOWER - program crashed because there was no file flag.txt from which it reads the flag!!!
+That means that I had to change tactics because I do not have access to the host and cannot attach to debug the program...
+Back to Ghidra, and discovered that in the main.openShop function there is vulnerable code that doesn't check if the amount entered is negative :) 
+After I have entered -40 as the amount of some fruit, I got 640 coins that was enough to buy the flag which was displayed in decimal code for ASCII. 
+After conversion, flag is:
+picoCTF{b4d_brogrammer_797b292c}
