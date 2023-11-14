@@ -1,0 +1,5 @@
+You will find the base64 encoded key in function openSafe() in downloaded file.
+You just need to decode it with:
+echo "cGwzYXMzX2wzdF9tM18xbnQwX3RoM19zYWYz" | base64 -d
+and this is also the flag:
+picoCTF{pl3as3_l3t_m3_1nt0_th3_saf3}                               
