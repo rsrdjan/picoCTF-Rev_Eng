@@ -1,0 +1,16 @@
+Although binary has a name "svchost.exe" it is actually an ELF binary file :)
+
+After some analysis, I can see that this program is written in ADA language. Nevertheless, by following execution
+flow, I saw that function FUN_0010298a is interesting because it contained calls to 28 different functions and returns.
+First function just delays the execution for some time, but the rest of 27 with "FUN_" prefix are printing one
+character at a time.
+
+For example:
+
+LEA RAX,[DAT_00102ce8]  (load effective address of memory location DAT_00102ce8 and store it in RAX register)
+...
+CALL <EXTERNAL>::ada__text_io__put__4  (call print function)
+
+
+When all charaters are printed:
+picoCTF{d15a5m_ftw_eab78e4}
