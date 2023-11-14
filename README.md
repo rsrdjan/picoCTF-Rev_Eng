@@ -4,4 +4,6 @@ Solutions to picoCTF challenges in "Reverse engineering" category. Updated when 
 
 ## Solutions
 
-Some solutions are given as ``(Python) scripts``, some as description in ``solutions.txt``. 
+Some solutions are given as ``scripts``, some as description in ``solutions.txt``. 
+
+Maybe one day I will do my solutions in proper markdown. Maybe.
