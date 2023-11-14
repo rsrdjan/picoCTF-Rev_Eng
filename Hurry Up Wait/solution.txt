@@ -5,9 +5,9 @@ flow, I saw that function FUN_0010298a is interesting because it contained calls
 First function just delays the execution for some time, but the rest of 27 with "FUN_" prefix are printing one
 character at a time.
 
-For example:
+For example (global var DAT_00102ce8 stores the value 0x7Dh which is hex code for ASCII character '}'):
 
-LEA RAX,[DAT_00102ce8]  (load effective address of memory location DAT_00102ce8 and store it in RAX register)
+LEA RAX,[DAT_00102ce8]  (load effective address of memory location of DAT_00102ce8 and store it in RAX register)
 ...
 CALL <EXTERNAL>::ada__text_io__put__4  (call print function)
 
