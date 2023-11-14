@@ -1,0 +1,3 @@
+chmod +x run
+./run Hello!
+The flag is: picoCTF{F1r57_4rgum3n7_f65ed63e}
