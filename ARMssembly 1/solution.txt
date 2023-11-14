@@ -1,0 +1,15 @@
+If you don't know ARM assembly, you can cross-compile ARM on X86-64:
+
+1. Save chall_1.S 
+2. Install QEMU (sudo apt install qemu-user-static)
+3. Install cross-compiler suite (sudo apt install binutils-aarch64-linux-gnu aarch64-linux-gnu-gcc)
+4. Assemble and link ARM code (aarch64-linux-gnu-as -o a.o chall.S && aarch64-linux-gnu-gcc -static -o chall a.o)
+
+You need to guess the argument to the chall binary so that the output would be "You win!".
+
+I fired up Ghidra and followed the decompiled flow, found out the func() function called on the argv1. 
+This function substracts argv1 from the hardcoded value 0xd2a in order to return 0 in which case the desired
+output will be printed. That means that this value is actuallt argv1 that we are looking for (in decimal form 0xd2a = 3370,
+so ./chall 3370).
+Also, 4-byte form of this hex value is the flag:
+picoCTF{00000d2a} 
