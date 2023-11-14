@@ -1,0 +1,3 @@
+Quite easy, from the patchme.flag.py file you can see that password is "ak98-=90adfjhgj321sleuth9000".
+Running the patchme.flag.py reveals the flag:
+picoCTF{p47ch1ng_l1f3_h4ck_c4a4688b}
