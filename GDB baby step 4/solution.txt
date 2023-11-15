@@ -1,0 +1,34 @@
+Download binary and run gdb with 'gdb debugger0_d'.
+Dissasemble main() function with 'disassemble main' and you will get the dump:
+
+   0x000000000040111c <+0>:     endbr64
+   0x0000000000401120 <+4>:     push   %rbp
+   0x0000000000401121 <+5>:     mov    %rsp,%rbp
+   0x0000000000401124 <+8>:     sub    $0x20,%rsp
+   0x0000000000401128 <+12>:    mov    %edi,-0x14(%rbp)
+   0x000000000040112b <+15>:    mov    %rsi,-0x20(%rbp)
+   0x000000000040112f <+19>:    movl   $0x28e,-0x4(%rbp)
+   0x0000000000401136 <+26>:    movl   $0x0,-0x8(%rbp)
+   0x000000000040113d <+33>:    mov    -0x4(%rbp),%eax
+   0x0000000000401140 <+36>:    mov    %eax,%edi
+   0x0000000000401142 <+38>:    call   0x401106 <func1>
+   0x0000000000401147 <+43>:    mov    %eax,-0x8(%rbp)
+   0x000000000040114a <+46>:    mov    -0x4(%rbp),%eax
+   0x000000000040114d <+49>:    leave
+   0x000000000040114e <+50>:    ret
+
+  At <+38> we can see call instruction which is invocating funcion func1(). We got the name
+  of the function where the instruction we are searching for is! Let's disassemble it with 
+  'disassemble func1' and we get the following dump:
+
+   0x0000000000401106 <+0>:     endbr64
+   0x000000000040110a <+4>:     push   %rbp
+   0x000000000040110b <+5>:     mov    %rsp,%rbp
+   0x000000000040110e <+8>:     mov    %edi,-0x4(%rbp)
+   0x0000000000401111 <+11>:    mov    -0x4(%rbp),%eax
+   0x0000000000401114 <+14>:    imul   $0x3269,%eax,%eax
+   0x000000000040111a <+20>:    pop    %rbp
+   0x000000000040111b <+21>:    ret
+
+We have the value at <+14>. After conversion of value 0x3269, our flag is:
+picoCTF{12905}
