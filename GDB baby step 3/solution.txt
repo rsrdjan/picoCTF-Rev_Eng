@@ -1,0 +1,21 @@
+Download binary and run gdb with 'gdb debugger0_c'.
+Dissasemble main() function with 'disassemble main' and you will get the dump:
+
+   0x0000000000401106 <+0>:     endbr64
+   0x000000000040110a <+4>:     push   %rbp
+   0x000000000040110b <+5>:     mov    %rsp,%rbp
+   0x000000000040110e <+8>:     mov    %edi,-0x14(%rbp)
+   0x0000000000401111 <+11>:    mov    %rsi,-0x20(%rbp)
+   0x0000000000401115 <+15>:    movl   $0x2262c96b,-0x4(%rbp)
+   0x000000000040111c <+22>:    mov    -0x4(%rbp),%eax
+   0x000000000040111f <+25>:    pop    %rbp
+   0x0000000000401120 <+26>:    ret
+
+Our memory load is at <+15>, meaning we have to set a breakpoint on next instruction:
+b *(main+22)
+and run the program with 'run'. Now we can inspect the address of $rbp-0x4:
+x/4xb $rbp-0x4
+which outputs our bytes as they are stored in memory:
+0x7fffffffddec: 0x6b    0xc9    0x62    0x22
+We got our flag:
+picoCTF{0x6bc96222}
