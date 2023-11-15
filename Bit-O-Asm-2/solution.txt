@@ -1,0 +1,10 @@
+In assembly dump file there are following two instructions:
+
+<+15>:    mov    DWORD PTR [rbp-0x4],0x9fe1a
+<+22>:    mov    eax,DWORD PTR [rbp-0x4]
+
+meaning we are storing DWORD value 0x9fe1a in the memory location pointed to by
+[rbp-0x4] (instruction 1) and storing that value in eax register (instruction 2).
+
+0x9fe1a in hex is 654874 in decimal:
+picoCTF{654874}
