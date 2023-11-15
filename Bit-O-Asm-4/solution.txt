@@ -1,0 +1,22 @@
+In assembly dump file there are following instructions:
+
+<+15>:    mov    DWORD PTR [rbp-0x4],0x9fe1a
+<+22>:    cmp    DWORD PTR [rbp-0x4],0x2710
+<+29>:    jle    0x55555555514e <main+37>
+<+31>:    sub    DWORD PTR [rbp-0x4],0x65
+<+35>:    jmp    0x555555555152 <main+41>
+<+37>:    add    DWORD PTR [rbp-0x4],0x65
+<+41>:    mov    eax,DWORD PTR [rbp-0x4]
+
+This is what CPU executes:
+
+<+15>:  Store 0x9fe1a in mem pointer by [rbp-0x4]
+<+22>:  Compare [rbp-0x4] and 0x2710
+<+29>:  Jump to instruction at <+37> if [rbp-0x4] is less or equeal to 0x2710 (it is NOT)
+<+31>:  Substract 0x65 from [rbp-0x4] and store it in [rbp-0x4]
+<+35>:  Jump to <+41>
+<+37>:  [NOT EXECUTED]
+<+41>:  Store value pointed by [rbp-0x4] in eax register
+
+After all computations and conversion from hex, we get the decimal number and our flag:
+picoCTF{654773}
