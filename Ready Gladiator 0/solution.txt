@@ -1,0 +1,24 @@
+In order to solve this challenge, you need to know the rules and theory of CoreWars game (I didn't, had to google it).
+Solution that worked for me is to change the code of he Imp (imp.red) in MOV instruction (MOV 0, 1 -> MOV 1,1):
+
+nc saturn.picoctf.net 65303 < imp.red 
+;redcode
+;name Imp Ex
+;assert 1
+mov 1, 1
+end
+Submit your warrior: (enter 'end' when done)
+
+Warrior1:
+;redcode
+;name Imp Ex
+;assert 1
+mov 1, 1
+end
+
+Rounds: 100
+Warrior 1 wins: 0
+Warrior 2 wins: 100
+Ties: 0
+You did it!
+picoCTF{h3r0_t0_z3r0_4m1r1gh7_f1e207c4}
