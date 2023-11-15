@@ -1,0 +1,12 @@
+This one was a bit hard for me, because I didn't have a clue about 3D software or geometrical representation of objects.
+You're provided with .dae file that represents 3D model with two axles. After I found out what are .dae files and installed
+Blender (sudo apt install blender), I loaded the file and managed to zoom in to see the object that was some kind of
+mechanical machine with two rotors - blue that is attached to blue exle and red one with red axle. By visually inspecting
+the object, I noticed that blue rotor had 8 knobs (are they knobs? or how they are called... anyway...) and red one 40.
+That means that when you turn one cycle with red axle, blue one turns 40 knobs, giving us 8:40 (5x) ratio.
+We're provided with file input.txt that contains huge decimal number which is the input that should provide us with the
+flag as output.
+So, the formula is input.txt number * 5, and this result should be converted to hex representation in order to convert it
+to ASCII:
+0x7069636f4354467b67333472355f30665f6d3072335f64303563366436337d -> picoCTF{g34r5_0f_m0r3_d05c6d63}
+It is kinda simple but you need to understand what is asked. Cheers.
