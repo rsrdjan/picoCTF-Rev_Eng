@@ -1,0 +1,5 @@
+In assembly dump file there is an instruction
+mov eax,0x30
+meaning that we are storing value of 0x30 in the eax register.
+0x30 in hex is 48 in decimal:
+picoCTF{48}
