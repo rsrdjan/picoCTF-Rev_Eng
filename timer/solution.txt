@@ -1,0 +1,9 @@
+As noted in hints, you need to decompile .apk first. I used jadx decompiler - install it with sudo apt install jadx.
+Follow the steps:
+
+Copy timer.apk in jadx directory:  sudo mv timer.apk /usr/share/jadx/bin/ && cd /usr/share/jadx/bin
+Execute jadx: sudo jadx -d out timer.apk && cd out/resources
+Search manifest file for the flag: cat AndroidManifest.xml | grep pico
+
+and you will get:
+picoCTF{t1m3r_r3v3rs3d_succ355fully_17496}
