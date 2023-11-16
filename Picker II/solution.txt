@@ -1,0 +1,29 @@
+When connecting to the host and trying to input 'win' you will see the 'illegal input'.
+Why is that? It is because now we have new function filter() that checks if you entered
+'win' and returns false if you did:
+
+def filter(user_input):
+  if 'win' in user_input:
+    return False
+  return True
+
+Now, there is a hint: "Can you do what win does with your input to the program?"
+Let see function win():
+
+def win():
+  # This line will not work locally unless you create your own 'flag.txt' in
+  #   the same directory as this script
+  flag = open('flag.txt', 'r').read()
+  #flag = flag[:-1]
+  flag = flag.strip()
+  str_flag = ''
+  for c in flag:
+    str_flag += str(hex(ord(c))) + ' '
+  print(str_flag)
+
+Ok, so let's try to open and print file flag.txt:
+
+==> print(open('flag.txt','r').read())
+picoCTF{f1l73r5_f41l_c0d3_r3f4c70r_m1gh7_5ucc33d_0b5f1131}
+
+Oh, we got it!
