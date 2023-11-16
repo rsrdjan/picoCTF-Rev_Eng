@@ -1,0 +1,14 @@
+After you download python file (picker-I.py), you can see that it contains several functions. Two of them
+(esoteric1() and esoteric2()) are just printing some C code, while win() function i of particular interest
+since it opens the file flag.txt and prints its contents in hex. 
+Now, code that gets executed is the one that enters infinite loop and waits for you to enter
+'getRandomNumber' in order to print number 4. Nevertheless, key is the eval() call that executes what you
+enter, that is, function with the name that you enter. 
+Since we have win() function, we can just enter 'win' and it will execute it, thus print flag in hex:
+
+Try entering "getRandomNumber" without the double quotes...
+==> win
+0x70 0x69 0x63 0x6f 0x43 0x54 0x46 0x7b 0x34 0x5f 0x64 0x31 0x34 0x6d 0x30 0x6e 0x64 0x5f 0x31 0x6e 0x5f 0x37 0x68 0x33 0x5f 0x72 0x30 0x75 0x67 0x68 0x5f 0x36 0x65 0x30 0x34 0x34 0x34 0x30 0x64 0x7d 
+
+After conversion to ASCII, this is our flag:
+picoCTF{4_d14m0nd_1n_7h3_r0ugh_6e04440d}
