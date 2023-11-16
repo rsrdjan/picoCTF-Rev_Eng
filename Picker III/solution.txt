@@ -1,0 +1,48 @@
+When I analyzed downloaded python file (picker-III.py), I needed to understand the logic of the
+program first. Two key functions are following ones:
+
+def check_table():
+  global func_table
+
+  if( len(func_table) != FUNC_TABLE_ENTRY_SIZE * FUNC_TABLE_SIZE):
+    return False
+
+  return True
+
+
+def get_func(n):
+  global func_table
+
+  # Check table for viability
+  if( not check_table() ):
+    print(CORRUPT_MESSAGE)
+    return
+
+  # Get function name from table
+  func_name = ''
+  func_name_offset = n * FUNC_TABLE_ENTRY_SIZE
+  for i in range(func_name_offset, func_name_offset+FUNC_TABLE_ENTRY_SIZE):
+    if( func_table[i] == ' '):
+      func_name = func_table[func_name_offset:i]
+      break
+
+  if( func_name == '' ):
+    func_name = func_table[func_name_offset:func_name_offset+FUNC_TABLE_ENTRY_SIZE]
+  
+  return func_name
+
+  From the check_table() I could deduce the length of the string that get_func() parses (FUNC_TABLE_ENTRY_SIZE * FUNC_TABLE_SIZE = 128).
+  What get_func() does is returning the name of functions in continuos strings (with no white space). 
+  So, the only thing I needed to do is to pass new string of 'win + " " * 125' to function 3 in a program. Of course, func_table is the
+  name of variable you want to set. The only thing that is left is to execute function 1 in the program (we have no other function, just
+  blank spaces afterwards).
+  I got the following byte array:
+
+  0x70 0x69 0x63 0x6f 0x43 0x54 0x46 0x7b 0x37 0x68 0x31 0x35 0x5f 0x31 0x35 0x5f 0x77 0x68 0x34 0x37 0x5f 0x77 0x33 0x5f 0x67 0x33 0x37 
+  0x5f 0x77 0x31 0x37 0x68 0x5f 0x75 0x35 0x33 0x72 0x35 0x5f 0x31 0x6e 0x5f 0x63 0x68 0x34 0x72 0x67 0x33 0x5f 0x61 0x31 0x38 0x36 0x66 
+  0x39 0x61 0x63 0x7d
+
+  When converted to decimal:
+  picoCTF{7h15_15_wh47_w3_g37_w17h_u53r5_1n_ch4rg3_a186f9ac}
+  Voila!
+  
