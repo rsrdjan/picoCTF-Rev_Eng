@@ -4,6 +4,11 @@ since it opens the file flag.txt and prints its contents in hex.
 Now, code that gets executed is the one that enters infinite loop and waits for you to enter
 'getRandomNumber' in order to print number 4. Nevertheless, key is the eval() call that executes what you
 enter, that is, function with the name that you enter. 
+Let's connect to the host:
+
+nc saturn.picoctf.net 60412
+
+
 Since we have win() function, we can just enter 'win' and it will execute it, thus print flag in hex:
 
 Try entering "getRandomNumber" without the double quotes...
