@@ -1,0 +1,13 @@
+If you don't know ARM assembly, you can cross-compile ARM on X86-64:
+
+1. Save chall_3.S 
+2. Install QEMU (sudo apt install qemu-user-static)
+3. Install cross-compiler suite (sudo apt install binutils-aarch64-linux-gnu aarch64-linux-gnu-gcc)
+4. Assemble and link ARM code (aarch64-linux-gnu-as -o a.o chall_3.S && aarch64-linux-gnu-gcc -static -o chall_3 a.o)
+
+The question was: "What integer does this program print with argument 2541039191?"
+
+Running ./chall_2 2541039191 outputs "Result: 57"
+Converting 57 to hex: 0x00000039
+So the flag is:
+picoCTF{00000039}
