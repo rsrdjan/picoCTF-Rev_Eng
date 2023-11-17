@@ -1,0 +1,63 @@
+After I have downloaded chall.S and compiled it, Ghidra decompiler comes to help for static analysis.
+I renamed couple of variables to make my life easier and here's the listing of interesting code:
+
+
+  local_98 = 0x396c109a7067b614;
+  local_90 = 0x32ea1ab1495990f0;
+  local_88 = 0xd09aa897d230c8fe;
+  local_80 = 0x2c227b84b00f7d0b;
+  local_78 = 0xb0a880f7d99ea817;
+  local_70 = 0xc8f18206086afe7c;
+  local_68 = 0x61;
+  local_58 = 0x563f52ce0f15cd77;
+  local_50 = 0x719435c3652ef38f;
+  local_48 = 0x8bec9fe9be05a4c9;
+  local_40 = 0x521c05fe8d590431;
+  local_38 = 0xdbf1c3a6dadcef7b;
+  local_30 = 0xc4fc8b585631f076;
+  local_28 = 0x3f;
+  fgets(input_array,0x31,stdin);
+  counter = 0;
+  while( true ) {
+    length_local_array = strlen((char *)&local_98);
+    if (length_local_array <= (ulong)(long)counter) break;
+    local_array[counter] =
+        (byte)counter ^
+         *(byte *)((long)&local_98 + (long)counter) ^ *(byte *)((long)&local_58 + (long)counter) ^
+         0x13;
+    counter = counter + 1;
+  }
+  iVar1 = memcmp(input_array,local_array,0x31);
+  if (iVar1 == 0) {
+    puts("No, that\'s not right.");
+  }
+  else {
+    puts("Correct! You entered the flag.");
+  }
+
+So basically what this code does is that it is populating two arrays with 49 bytes each and then preparing 
+the secret value to compare with user input by xoring with following formula:
+
+counter ^ array1[counter] ^ array2[counter] ^ 0x13
+
+and storing it in local_array[]. That means the only thing we need to do is to set a breakpoint at memcmp(),
+input some chars and read the contents of local_array[]. By dissasembling we found that memory address of
+local_array[] is $rbp-0x110. Let's get dynamic! I'm using gdb with gef and this is what I did:
+
+gef➤  b *(main+385)    <== setting breakpoint at memcmp() call
+Breakpoint 1 at 0x12fa
+gef➤  r        <== running chall program
+Starting program: /home/rsrdjan/Downloads/chall 
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa    <== our input
+
+Breakpoint 1, 0x00005555555552fa in main ()
+
+gef➤  hexdump byte --size 49 $rbp-0x110
+0x00007fffffffdc20     70 69 63 6f 43 54 46 7b 64 79 6e 34 6d 31 63 5f    picoCTF{dyn4m1c_
+0x00007fffffffdc30     34 6e 34 6c 79 31 73 5f 31 73 5f 35 75 70 33 72    4n4ly1s_1s_5up3r
+0x00007fffffffdc40     5f 75 73 33 66 75 6c 5f 31 34 62 66 61 37 30 30    _us3ful_14bfa700
+0x00007fffffffdc50     7d                
+
+And that's it.
