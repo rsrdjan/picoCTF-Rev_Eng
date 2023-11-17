@@ -1,12 +1,12 @@
 not-crypto is a stripped binary, meaning that I have to calculate main() address and work from that
 point onwards. But first, I like to do static analysis to see if I can spare myself of assembler
-listings and try to analyze the structure and the flow through decomipiled pseudocode. Time for Ghidra!
+listings and try to analyze the structure and the flow through decompiled pseudocode. Time for Ghidra!
 
 Function FUN_00101070 seems interesting since after all these mambo-jumbo xoring and whatnot, it has 
 memcmp() call on line 386 and that is usually sign of checking against hard-coded value (our flag). 
-Trying to avoid going through pain of code analysis (it is a long function), it's time for some dynamic.
+Trying to avoid going through pain of code analysis (it is a long function), let's do some dynamic instead.
 
-Let's start my favourite tool gef (gdb with enhanced features):
+My favourite tool gef (gdb with enhanced features) comes handy:
 
 gdb -q not-crypto 
 GEF for linux ready, type `gef' to start, `gef config' to configure
@@ -81,7 +81,7 @@ running program (0x555555554000 + 0x1c70) and set a breakpoint:
 gef➤  b *(0x555555554000 + 0x1c70)
 Breakpoint 1 at 0x555555555c70
 
-Now we need to continue with the execution twice to reach our breakpoint:
+We need to continue with the execution twice to reach our breakpoint:
 
 [#0] Id 1, Name: "not-crypto", stopped 0x555555555c70 in ?? (), reason: BREAKPOINT
 
@@ -283,6 +283,7 @@ gef➤  x/300i $rip
    0x5555555553b9:	call   0x555555555060 <memcmp@plt>
    0x5555555553be:	mov    r12d,eax
    0x5555555553c1:	test   eax,eax
+...
 
 And we got it at 0x5555555553b9! Set a breakpoint and continue:
 
@@ -291,18 +292,18 @@ Breakpoint 3 at 0x5555555553b9
 gef➤  c
 Continuing.
 I heard you wanted to bargain for a flag... whatcha got?
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa    <== out input
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa    <== our input
 
 Breakpoint 3, 0x00005555555553b9 in ?? ()
 
 Ok, now that we hit memcmp(), let's try to dig our flag. Ghidra tells us that second parameter of
-memcmp() is our hard-coded (actually calculated and stored) value against which we are comparing
-the input. This is how it looks:
+memcmp() is our hard-coded (actually calculated and stored) value against which it compares the
+input. This is how it looks:
 
 00101146 48 8d 7c        LEA        RDI=>local_198,[RSP + 0x70]
          24 70
 
-Does the address in rdi register point to our flag?
+Is address in rdi register pointer to our flag?
 
 ef➤  hexdump byte --size 64 $rdi
 0x00007fffffffdca0     70 69 63 6f 43 54 46 7b 63 30 6d 70 31 6c 33 72    picoCTF{c0mp1l3r
@@ -310,6 +311,6 @@ ef➤  hexdump byte --size 64 $rdi
 0x00007fffffffdcc0     5f 70 75 72 33 5f 77 31 7a 34 72 64 72 79 5f 62    _pur3_w1z4rdry_b
 0x00007fffffffdcd0     75 74 5f 6e 30 5f 70 72 30 62 6c 33 6d 3f 7d 0a    ut_n0_pr0bl3m?}.
 
-Oh yeah baby. 
+Oh yeah. 
 
 picoCTF{c0mp1l3r_0pt1m1z4t10n_15_pur3_w1z4rdry_but_n0_pr0bl3m?}
