@@ -1,0 +1,209 @@
+I have to say this one was extremely time consuming. 
+Binary 'brute' is ELF x86 stripped binary. Static analysis with Ghidra decompiler was easy part, because
+there are no many functions and program logic is somewhat simple. But (there is always 'but'), code is
+mostly related to the transformation of the input and comparison with the encoded flag.
+
+Here is the function with a key functionality:
+
+undefined4 FUN_000108c4(char *param_1,uint param_2)
+
+{
+  char *__dest;
+  char *__dest_00;
+  uint local_18;
+  
+  __dest = (char *)calloc(param_2 + 1,1);
+  strncpy(__dest,param_1,param_2);
+  FUN_000107c2(__dest,param_2,0xffffffff);
+  __dest_00 = (char *)calloc(param_2 + 1,1);
+  strncpy(__dest_00,&DAT_00012008,param_2);
+  FUN_000107c2(__dest_00,param_2,0xffffffff);
+  puts("checking solution...");
+  local_18 = 0;
+  while( true ) {
+    if (param_2 <= local_18) {
+      return 1;
+    }
+    if (__dest[local_18] != __dest_00[local_18]) break;
+    local_18 = local_18 + 1;
+  }
+  return 0xffffffff;
+}
+
+Comparison is on a char by char basis in the following line:
+
+if (__dest[local_18] != __dest_00[local_18]) break;
+
+This piece of code in assembler looks like this:
+
+
+                             LAB_00010978                                    XREF[1]:     000109a5(j)  
+        00010978 8b 55 f0        MOV        EDX,dword ptr [EBP + local_14]
+        0001097b 8b 45 ec        MOV        EAX,dword ptr [EBP + local_18]
+        0001097e 01 d0           ADD        EAX,EDX
+        00010980 0f b6 10        MOVZX      EDX,byte ptr [EAX]
+        00010983 8b 4d f4        MOV        ECX,dword ptr [EBP + local_10]
+        00010986 8b 45 ec        MOV        EAX,dword ptr [EBP + local_18]
+        00010989 01 c8           ADD        EAX,ECX
+        0001098b 0f b6 00        MOVZX      EAX,byte ptr [EAX]
+        0001098e 38 c2           CMP        DL,AL
+        00010990 74 09           JZ         LAB_0001099b
+        00010992 c7 45 e8        MOV        dword ptr [EBP + local_1c],0xffffffff
+                 ff ff ff ff
+        00010999 eb 0c           JMP        LAB_000109a7
+
+CMP DL,AL is where magic happens. Let's try to locate the address of this instruction in the memory
+of a running process. Since there are no debugging simbols, it is reasonable to set a breakpoint to
+__libc_start_main:
+
+gdb -q brute           
+GEF for linux ready, type `gef' to start, `gef config' to configure
+89 commands loaded and 5 functions added for GDB 13.2 in 0.00ms using Python engine 3.11
+Reading symbols from brute...
+(No debugging symbols found in brute)
+gef➤  b __libc_start_main
+Breakpoint 1 at 0x530
+
+Let's run and inspect the .text segment:
+
+gef➤  info files
+Symbols from "/home/rsrdjan/Downloads/brute".
+Native process:
+	Using the running image of child Thread 0xf7fc34c0 (LWP 302527).
+	While running this, GDB does not access memory from...
+Local exec file:
+	`/home/rsrdjan/Downloads/brute', file type elf32-i386.
+	Entry point: 0x56555580
+	0x56555154 - 0x56555167 is .interp
+	0x56555168 - 0x56555188 is .note.ABI-tag
+	0x56555188 - 0x565551ac is .note.gnu.build-id
+	0x565551ac - 0x565551cc is .gnu.hash
+	0x565551cc - 0x565552cc is .dynsym
+	0x565552cc - 0x565553b3 is .dynstr
+	0x565553b4 - 0x565553d4 is .gnu.version
+	0x565553d4 - 0x56555414 is .gnu.version_r
+	0x56555414 - 0x5655545c is .rel.dyn
+	0x5655545c - 0x565554a4 is .rel.plt
+	0x565554a4 - 0x565554c7 is .init
+	0x565554d0 - 0x56555570 is .plt
+	0x56555570 - 0x56555580 is .plt.got
+	0x56555580 - 0x56555b34 is .text
+	0x56555b34 - 0x56555b48 is .fini
+	0x56555b48 - 0x56555b8a is .rodata
+	0x56555b8c - 0x56555bf8 is .eh_frame_hdr
+	0x56555bf8 - 0x56555dbc is .eh_frame
+	0x56556eb8 - 0x56556ebc is .init_array
+	0x56556ebc - 0x56556ec0 is .fini_array
+	0x56556ec0 - 0x56556fb8 is .dynamic
+	0x56556fb8 - 0x56557000 is .got
+	0x56557000 - 0x56557026 is .data
+	0x56557026 - 0x56557028 is .bss
+	0xf7fca154 - 0xf7fca178 is .note.gnu.build-id in /lib/ld-linux.so.2
+	0xf7fca178 - 0xf7fca2b8 is .hash in /lib/ld-linux.so.2
+	0xf7fca2b8 - 0xf7fca41c is .gnu.hash in /lib/ld-linux.so.2
+	0xf7fca41c - 0xf7fca6ac is .dynsym in /lib/ld-linux.so.2
+	0xf7fca6ac - 0xf7fca95f is .dynstr in /lib/ld-linux.so.2
+	0xf7fca960 - 0xf7fca9b2 is .gnu.version in /lib/ld-linux.so.2
+	0xf7fca9b4 - 0xf7fcaac4 is .gnu.version_d in /lib/ld-linux.so.2
+	0xf7fcaac4 - 0xf7fcaadc is .rel.dyn in /lib/ld-linux.so.2
+	0xf7fcaadc - 0xf7fcaae8 is .relr.dyn in /lib/ld-linux.so.2
+	0xf7fcb000 - 0xf7fec731 is .text in /lib/ld-linux.so.2
+	0xf7fed000 - 0xf7ff2e06 is .rodata in /lib/ld-linux.so.2
+	0xf7ff2e08 - 0xf7ff37bc is .eh_frame_hdr in /lib/ld-linux.so.2
+	0xf7ff37bc - 0xf7ffa418 is .eh_frame in /lib/ld-linux.so.2
+	0xf7ffbbc0 - 0xf7ffcf34 is .data.rel.ro in /lib/ld-linux.so.2
+	0xf7ffcf34 - 0xf7ffcfe4 is .dynamic in /lib/ld-linux.so.2
+	0xf7ffcfe4 - 0xf7ffcfec is .got in /lib/ld-linux.so.2
+	0xf7ffcff4 - 0xf7ffd000 is .got.plt in /lib/ld-linux.so.2
+	0xf7ffd000 - 0xf7ffd938 is .data in /lib/ld-linux.so.2
+	0xf7ffd938 - 0xf7ffda28 is .bss in /lib/ld-linux.so.2
+	0xf7fc80b4 - 0xf7fc80f8 is .hash in system-supplied DSO at 0xf7fc8000
+	0xf7fc80f8 - 0xf7fc8148 is .gnu.hash in system-supplied DSO at 0xf7fc8000
+	0xf7fc8148 - 0xf7fc8208 is .dynsym in system-supplied DSO at 0xf7fc8000
+	0xf7fc8208 - 0xf7fc82d6 is .dynstr in system-supplied DSO at 0xf7fc8000
+	0xf7fc82d6 - 0xf7fc82ee is .gnu.version in system-supplied DSO at 0xf7fc8000
+	0xf7fc82f0 - 0xf7fc8344 is .gnu.version_d in system-supplied DSO at 0xf7fc8000
+	0xf7fc8344 - 0xf7fc83d4 is .dynamic in system-supplied DSO at 0xf7fc8000
+	0xf7fc83d4 - 0xf7fc83e0 is .rodata in system-supplied DSO at 0xf7fc8000
+	0xf7fc83e0 - 0xf7fc8444 is .note in system-supplied DSO at 0xf7fc8000
+	0xf7fc8444 - 0xf7fc8468 is .eh_frame_hdr in system-supplied DSO at 0xf7fc8000
+	0xf7fc8468 - 0xf7fc8574 is .eh_frame in system-supplied DSO at 0xf7fc8000
+	0xf7fc8580 - 0xf7fc9626 is .text in system-supplied DSO at 0xf7fc8000
+	0xf7fc9626 - 0xf7fc974c is .altinstructions in system-supplied DSO at 0xf7fc8000
+	0xf7fc974c - 0xf7fc97a0 is .altinstr_replacement in system-supplied DSO at 0xf7fc8000
+	0xf7c001b4 - 0xf7c001d8 is .note.gnu.build-id in /lib/i386-linux-gnu/libc.so.6
+	0xf7c001d8 - 0xf7c001f8 is .note.ABI-tag in /lib/i386-linux-gnu/libc.so.6
+	0xf7c001f8 - 0xf7c045b0 is .hash in /lib/i386-linux-gnu/libc.so.6
+	0xf7c045b0 - 0xf7c09900 is .gnu.hash in /lib/i386-linux-gnu/libc.so.6
+	0xf7c09900 - 0xf7c16830 is .dynsym in /lib/i386-linux-gnu/libc.so.6
+	0xf7c16830 - 0xf7c1f243 is .dynstr in /lib/i386-linux-gnu/libc.so.6
+	0xf7c1f244 - 0xf7c20c2a is .gnu.version in /lib/i386-linux-gnu/libc.so.6
+	0xf7c20c2c - 0xf7c21314 is .gnu.version_d in /lib/i386-linux-gnu/libc.so.6
+	0xf7c21314 - 0xf7c21354 is .gnu.version_r in /lib/i386-linux-gnu/libc.so.6
+	0xf7c21354 - 0xf7c21634 is .rel.dyn in /lib/i386-linux-gnu/libc.so.6
+	0xf7c21634 - 0xf7c216d4 is .rel.plt in /lib/i386-linux-gnu/libc.so.6
+	0xf7c216d4 - 0xf7c21800 is .relr.dyn in /lib/i386-linux-gnu/libc.so.6
+	0xf7c22000 - 0xf7c22150 is .plt in /lib/i386-linux-gnu/libc.so.6
+	0xf7c22150 - 0xf7c22160 is .plt.got in /lib/i386-linux-gnu/libc.so.6
+	0xf7c22160 - 0xf7d99555 is .text in /lib/i386-linux-gnu/libc.so.6
+	0xf7d99560 - 0xf7d9a702 is __libc_freeres_fn in /lib/i386-linux-gnu/libc.so.6
+	0xf7d9b000 - 0xf7dc03f8 is .rodata in /lib/i386-linux-gnu/libc.so.6
+	0xf7dc03f8 - 0xf7dc040b is .interp in /lib/i386-linux-gnu/libc.so.6
+	0xf7dc040c - 0xf7dc8188 is .eh_frame_hdr in /lib/i386-linux-gnu/libc.so.6
+	0xf7dc8188 - 0xf7e1ace8 is .eh_frame in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1ace8 - 0xf7e1b3fa is .gcc_except_table in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1c478 - 0xf7e1c480 is .tdata in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1c480 - 0xf7e1c4c8 is .tbss in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1c480 - 0xf7e1c48c is .init_array in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1c48c - 0xf7e1c500 is __libc_subfreeres in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1c500 - 0xf7e1cb54 is __libc_IO_vtables in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1cb60 - 0xf7e1dd8c is .data.rel.ro in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1dd8c - 0xf7e1de8c is .dynamic in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1de8c - 0xf7e1dfec is .got in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1dff4 - 0xf7e1e050 is .got.plt in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1e060 - 0xf7e1ef18 is .data in /lib/i386-linux-gnu/libc.so.6
+	0xf7e1ef20 - 0xf7e2891c is .bss in /lib/i386-linux-gnu/libc.so.6
+gef➤  
+
+
+Now that we know address range of .text (0x56555580 - 0x56555b34) why not disassemble
+the whole program and try to find our CMP instruction?
+We'll start by calculating the range of .text region (number of lines of assembly code):
+
+0x56555b34 - 0x56555580 = 0x5B4 (1460)
+
+So let's see those 1460 lines and filter the output with grep:
+
+gef➤  pipe x/1460i 0x56555580 | grep "cmp    dl,al"
+   0x5655598e:	cmp    dl,al
+
+Breakpoint at the instruction address is a good idea:
+
+gef➤  b *0x5655598e
+Breakpoint 2 at 0x5655598e
+
+Now comes the tricky part. Because our input is getting transformed and THEN compared with
+the flag which is also encoded, we need to automate, or better to say, we need to brute force
+the input with every character that is allowed in picoCTF flags (all alphanumerics + {,},and _),
+and check for every CMP outcome. If dl == al, then we have one character in our flag right, so
+we can move to the other. But one thing we're missing, and that is the length of the array that
+holds our encoded flag.
+This instruction is located right under our CMP dl,al:
+
+0x565559a2                  cmp    eax, DWORD PTR [ebp+0xc]
+
+Now, let's reveal what ebp-0xc pointer points to:
+
+gef➤  hexdump byte --size 1 $ebp-0xc
+0xffffceec     30  
+
+... and we got our length. Now we have all ingredients for some python scripting. Script that does
+the job is easy-solution.py and you can download it.
+
+After we run the script with
+
+gdb -x easy-solution.py
+
+we have the flag:
+
+Flag: picoCTF{I_5D3_A11DA7_0db137a9}
